@@ -14,6 +14,9 @@ use yii\filters\VerbFilter;
  */
 class UserController extends Controller
 {
+
+    public $layout = 'managerLayout.php';
+
     /**
      * {@inheritdoc}
      */
@@ -86,8 +89,15 @@ class UserController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $user_model = Yii::$app->request->post('User');
+
+            $model->email = $user_model['email'];
+
+            if($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+
         }
 
         return $this->render('update', [

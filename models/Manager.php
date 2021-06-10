@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use app\models\User;
 
 /**
  * This is the model class for table "post".
@@ -102,18 +103,18 @@ class Manager extends ActiveRecord
    public function attributeLabels()
     {
         return [
-            'type_form' => 'Type',
-            'company_name' => 'Company Name',
-            'position' => 'Position',
+            'type_form' => 'Тип формы',
+            'company_name' => 'Название компании',
+            'position' => 'Должность',
 
-            'contact_name' => 'Contact Name',
-            'company_email' => 'Company Email',
+            'contact_name' => 'Имя',
+            'company_email' => 'Email',
 
-            'position_description' => 'Position Description',
-            'salary' => 'Salary',
-            'dateStart' => 'dateStart',
-            'dateEnd' => 'dateEnd',
-            'datePostAt' => 'Post At'
+            'position_description' => 'Описание должности',
+            'salary' => 'Зарплата',
+            'dateStart' => 'Дата начала',
+            'dateEnd' => 'Дата окончания',
+            'datePostAt' => 'Дата размещения'
         ];
     }
 
@@ -198,16 +199,18 @@ class Manager extends ActiveRecord
     public function sendMail($id) {
 
         $sender = Manager::find()->with('postsQueues')->with('descriptivePost')->with('contactPost')->where('id = :id', [':id' => $id])->limit(1)->one();
+        $email = User::find()->select(['email'])->where('username = :username', [':username' => 'admin'])->asArray()->one();
+        $admin_email = $email['email'];
         // Set layout params
-//        \Yii::$app->mailer->getView()->params['CompanyName'] = $sender->company_name;
+        \Yii::$app->mailer->getView()->params['CompanyName'] = $sender->company_name;
 
         $result = \Yii::$app->mailer->compose(
-            'views/contact-html', ['sender' => $sender])->setTo([\Yii::$app->params['adminEmail'] => $sender->company_name])
+            'views/contact-html', ['sender' => $sender])->setTo([$admin_email => $sender->company_name])
             ->setSubject('Задание для размещения')
             ->send();
 
         // Reset layout params
-//        \Yii::$app->mailer->getView()->params['CompanyName'] = null;
+        \Yii::$app->mailer->getView()->params['CompanyName'] = null;
 
         if ($result) {
             $notification = PostsQueue::find()->where('post_id = :post_id', [':post_id' => $id])->limit(1)->one();
@@ -217,5 +220,7 @@ class Manager extends ActiveRecord
 
         return $result;
     }
+
+
 
 }

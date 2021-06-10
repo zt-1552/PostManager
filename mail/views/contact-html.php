@@ -20,9 +20,6 @@
             <?php } ?>
 
             <?php if(isset($sender->contactPost))  {?>
-<!--                <p> --><?//= $sender->contactPost->contact_name ?><!-- объект <p>-->
-<!--                --><?//= $sender->contactPost['contact_name'] ?><!--  аррай <p>-->
-<!--                --><?//= $sender->contactPost->attributes['contact_name'] ?><!--  атрибютес аррай'-->
 
                     <h3>Контактное имя: <?= $sender->contactPost->contact_name ?></h3>
                     <h3>Контактный Email: <?= $sender->contactPost->company_email ?></h3>

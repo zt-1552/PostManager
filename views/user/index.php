@@ -25,11 +25,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'username',
-            'auth_key',
-            'password_hash',
-            'password_reset_token',
-            //'email:email',
-            //'status',
+//            'auth_key',
+//            'password_hash',
+//            'password_reset_token',
+            'email:email',
+//            'status',
             //'created_at',
             //'updated_at',
 
@@ -37,5 +37,10 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
+    <div>
+        <h2>Необходимые настройки</h2>
+		<p>Изменить адрес email у пользователя admin - туда будут приходить письма из очереди</p>
+        <p>Запустить в консоли команду <code>yii queue/listen 10</code></p>
 
+    </div>
 </div>

@@ -23,8 +23,8 @@ class BehaviorErrorQueue extends Behavior
     public function afterErrorSend($event) {
 
         return \Yii::$app->mailer->compose(
-            'views/contact-admin-html', ['event' => $event])->setTo([\Yii::$app->params['managerEmail'] => 'Менеджеру-админу'])
-            ->setSubject('Сообщение о событии в очереди EVENT_AFTER_EXEC')
+            'views/contact-admin-html', ['event' => $event])->setTo([\Yii::$app->params['adminEmail'] => 'Менеджеру-админу'])
+            ->setSubject('Сообщение о сбое в очереди EVENT_AFTER_ERROR')
             ->send();
     }
 }

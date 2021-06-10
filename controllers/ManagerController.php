@@ -2,9 +2,10 @@
 
 namespace app\controllers;
 
+use app\models\LoginForm;
 use app\models\Manager;
-use app\models\PostsQueue;
 use app\models\SendEmail;
+use app\models\User;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -51,38 +52,16 @@ class ManagerController extends Controller
     }
 
 
-    public function actionView() {
-
-        $this->view->title = 'Связанные данные в таблицах';
-        $posts = Manager::find()->with('postsQueues')->all();
-        $id = 101;
-        $sender = Manager::find()->with('postsQueues')->with('descriptivePost')->with('contactPost')->where('id = :id', [':id' => $id])->one();
-
-        return $this->render('view', compact('posts', 'sender'));
-    }
-
-
-    public function actionTestMailer($id) {
-//        $sender = new Manager();
-//        $sender->sendMail($id);
-//
-        Yii::$app->queue->push(new SendEmail([
-            'post_id' => $id,
-        ]));
-
-    }
-
-
     public function actionIndex()
     {
         $model = new Manager();
 
 
-        $model->load(\Yii::$app->request->post());
+        $model->load(Yii::$app->request->post());
 
 
-        if (\Yii::$app->request->isAjax) {
-            \Yii::$app->response->format = Response::FORMAT_JSON;
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
 
             if ($model->validate()) {
                 //добавление начато
@@ -100,22 +79,24 @@ class ManagerController extends Controller
                 //добавление оконченно
                 $this->_transaction = Yii::$app->db->beginTransaction();
                     $model->save();
-                    $exception = \Yii::$app->errorHandler->exception;
+                    $exception = Yii::$app->errorHandler->exception;
                     if ($exception !== null) {
                         $this->_transaction->rollBack();
                     } else {
                         $this->_transaction->commit();
-                        \Yii::$app->session->setFlash('success', 'Данные успешно отправлены через Ajax и сохранены');
+                        Yii::$app->session->setFlash('success', 'Данные успешно отправлены через Ajax и сохранены');
                         }
                 if ($model->datePostAt === date('d.m.Y')) {
                     Yii::$app->queue->push(new SendEmail([
                         'post_id' => $model->id,
                     ]));
-//                    $res = $model->sendMail($model->id);
-//                    if ($res) {
+//                    $res = $model->sendMail($model->id);// Можно включить эту часть кода (строки 105-107 нужно закоментить), сообщения будут отправляться сразу, но тогда
+//                    if ($res) {                         // будет немного тормозить страница с формой после нажатия кнопки "Отправить"
 //
-//                        \Yii::$app->session->setFlash('success', 'Данные успешно сохранены и отправлены на почту');
-//                    }
+//                        Yii::$app->session->setFlash('success', 'Данные успешно сохранены и отправлены на почту');
+//                    } else {
+//                        Yii::$app->session->setFlash('danger', 'Данные сохранены, но не отправлены на почту');
+//                      }
                 } else {
                     $delaySend = strtotime($model->datePostAt) - strtotime('now');
                     Yii::$app->queue->delay($delaySend)->push(new SendEmail([
@@ -126,7 +107,7 @@ class ManagerController extends Controller
 
                 $model = new Manager();
             } else {
-                \Yii::$app->session->setFlash('danger', 'Данные не отправлены');
+                Yii::$app->session->setFlash('danger', 'Данные не отправлены');
                 var_dump($model->getErrors());
                 return ActiveForm::validate($model);
             }
@@ -148,6 +129,40 @@ class ManagerController extends Controller
 
             return ActiveForm::validate($model);
         }
+    }
+
+    /**
+     * Login action.
+     *
+     * @return Response|string
+     */
+    public function actionLogin()
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new LoginForm();
+        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            return $this->goBack();
+        }
+
+        $model->password = '';
+        return $this->render('login', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Logout action.
+     *
+     * @return Response
+     */
+    public function actionLogout()
+    {
+        Yii::$app->user->logout();
+
+        return $this->goHome();
     }
 
 

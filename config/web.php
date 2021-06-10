@@ -8,6 +8,7 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log', 'queue'],
     'language' => 'ru',
+    'name' => 'PostManager',
     'defaultRoute' => 'manager/index',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
@@ -42,7 +43,7 @@ $config = [
                     'class' => 'Swift_SmtpTransport',
                     'host' => 'smtp.gmail.com',
                     'username' => 'zt.evakuator',
-                    'password' => 'zxc123zxc',
+                    'password' => '*******',
                     'port' => '587',
                     'encryption' => 'tls',
                     'streamOptions' => [ 'ssl' => [ 'allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false, ], ]
@@ -57,12 +58,6 @@ $config = [
             'channel' => 'default', // Queue channel key
             'mutex' => \yii\mutex\MysqlMutex::class, // Mutex used to sync queries
         ],
-//        'debug' => [
-//            'class' => \yii\debug\Module::class,
-//            'panels' => [
-//                'queue' => \yii\queue\debug\Panel::class,
-//            ],
-//        ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [

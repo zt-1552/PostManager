@@ -39,7 +39,20 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/manager/index']],
-            ['label' => 'Admin', 'url' => ['/post/index']],
+            Yii::$app->user->identity->username === 'admin' ? ['label' => 'Options', 'url' => ['/user/index']] : '',
+
+            Yii::$app->user->isGuest ? (
+            ['label' => 'Login', 'url' => ['/manager/login']]
+            ) : (
+                '<li>'
+                . Html::beginForm(['/manager/logout'], 'post')
+                . Html::submitButton(
+                    'Logout (' . Yii::$app->user->identity->username . ')',
+                    ['class' => 'btn btn-link logout']
+                )
+                . Html::endForm()
+                . '</li>'
+            )
          ],
     ]);
     NavBar::end();
@@ -56,9 +69,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
-
-        <p class="pull-right"><?= Yii::powered() ?></p>
+        <p class="pull-left">&copy; PostManager <?= date('Y') ?></p>
     </div>
 </footer>
 
